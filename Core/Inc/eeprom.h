@@ -5,6 +5,11 @@
  *     Rakshay Narayanan <rakshay@terpmail.umd.edu>
 */
 
+// notes:
+// F405: 32 bit (smallest = half-word)
+// L4: 32 bit (smallest = double-word) [ECC]
+// use preprocessing to adjust based on hardware
+
 #ifndef __EEPROM_H
 #define __EEPROM_H
 
@@ -13,7 +18,7 @@
 #define PAGE_SIZE ((uint32_t)0x20000) /* page size = 128KB */
 
 /* device voltage range supposed to be [2.7V to 3.6V] */
-#define VOLTAGE_RANGE ((uint8_t)FLASH_VOLTAGE_RANGE_3)
+#define VOLTAGE_RANGE FLASH_VOLTAGE_RANGE_3
 
 #define EEPROM_START_ADDRESS ((uint32_t)0x08020000) /* sector 5 */
 
@@ -46,9 +51,9 @@ typedef enum {
     EE_WRITE_PAGE
 } EE_Operation;
 
-uint16_t EE_Init(void);
-uint16_t EE_ReadVariable(uint16_t VirtAddress, uint16_t *Data);
-uint16_t EE_WriteVariable(uint16_t VirtAddress, uint16_t Data);
+HAL_StatusTypeDef EE_Init(void);
+HAL_StatusTypeDef EE_ReadVariable(uint16_t VirtAddress, uint16_t *Data);
+HAL_StatusTypeDef EE_WriteVariable(uint16_t VirtAddress, uint16_t Data);
 
 #endif /* __EEPROM_H */
 

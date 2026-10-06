@@ -9,11 +9,13 @@
 #include "stm32f4xx_hal_def.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
+#include <stdint.h>
 
 uint16_t data_var = 0;
 uint16_t virt_address_var_tab[NB_OF_VAR];
 
 static HAL_StatusTypeDef EE_Format(void);
+static HAL_StatusTypeDef EE_EraseSector(uint32_t sector);
 static uint16_t EE_FindValidPage(uint8_t operation);
 static uint16_t EE_VerifyPageFullWriteVariable(uint16_t virtaddress, uint16_t data);
 static uint16_t EE_PageTransfer(uint16_t virtaddress, uint16_t data);
@@ -31,8 +33,11 @@ HAL_StatusTypeDef EE_Init(void)
     switch (page0status) {
     case ERASED:
         if (page1status == VALID_PAGE) {
-            FLASH_Erase_Sector(PAGE0_ID, VOLTAGE_RANGE);
+            HAL_FLASH_Unlock();
+            EE_EraseSector(PAGE0_ID);
+            HAL_FLASH_Lock();
         } else if (page1status == RECEIVE_DATA) {
+
             FLASH_Erase_Sector(PAGE0_ID, VOLTAGE_RANGE);
 
             // mark page1 as valid
@@ -49,11 +54,24 @@ HAL_StatusTypeDef EE_Init(void)
 
     case RECEIVE_DATA:
         if (page1status == VALID_PAGE) {
-            for (
+            for (;;;) {
+
+            }
         }
     }
 
     return HAL_OK;
 }
 
+static HAL_StatusTypeDef EE_EraseSector(uint32_t sector)
+{
+    FLASH_EraseInitTypeDef eraseinfo = {0};
+    uint32_t sectorerror;
 
+    eraseinfo.TypeErase = 0U;
+    eraseinfo.NbSectors = 1U;
+    eraseinfo.Sector = sector;
+    eraseinfo.VoltageRange = VOLTAGE_RANGE;
+
+    return HAL_FLASHEx_Erase(&eraseinfo, &sectorerror);
+}
